@@ -4,6 +4,7 @@ const port = 3000
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const { User } = require("./models/Users")
+const { auth } = require("./middleware/auth")
 
 const config = require('./config/key')
 
@@ -19,7 +20,7 @@ app.get('/', (req, res) => {
   res.send('Hello World! Welcome')
 })
 
-app.post('/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
  
         const user = new User(req.body)
 
@@ -32,7 +33,7 @@ app.post('/register', (req, res) => {
 
 })
 
-app.post('/login', (req, res) => {
+app.post('/api/users/login', (req, res) => {
   console.log('test', req.body)
   User.findOne({email: req.body.email}, (err, user) => {
     if(!user){
@@ -53,6 +54,19 @@ app.post('/login', (req, res) => {
       })
 
     })
+  })
+})
+
+app.get('/api/users/auth', auth , (res, req) => {
+  res.status(200).json({
+    _id: req.user._id,
+    isAdmin: req.user.role === 0 ? true: false,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    role: req.user.role,
+    image: req.user.image,
   })
 })
 
